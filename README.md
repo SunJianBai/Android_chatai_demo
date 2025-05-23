@@ -1,0 +1,2 @@
+# Android_chatai_demo
+一个简单的demo应用用于和ai对话
