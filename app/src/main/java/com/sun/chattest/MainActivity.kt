@@ -44,12 +44,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun getResponse(question: String, callback: (String) -> Unit) {
-        val apiKey = "sk-trtxvukyresekejjnymgityktjyybtmtccvnlbwhbwnnvoji"  // 建议通过 gradle.properties 或安全方式存储
-        val url = "https://api.siliconflow.cn/v1/chat/completions" // 示例URL，请根据实际修改
+        val apiKey = "sk-trtxvuk****bwnnvoji"  // 硅基流动的apikey，改成自己的apikey
+        val url = "https://api.siliconflow.cn/v1/chat/completions" // 硅基流动的url,可以改成自己的
 
         val json = """
             {
-                "model": "Qwen/QwQ-32B",
+                "model": "Qwen/QwQ-32B",  
                 "messages": [
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": "$question"}
@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
                 "temperature": 0.7,
                 "max_tokens": 1024
             }
-        """.trimIndent()
+        """.trimIndent()   //model：模型名称，可以改成自己的模型名称，如：gpt-3.5-turbo
 
         val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
         val body = json.toRequestBody(mediaType)
