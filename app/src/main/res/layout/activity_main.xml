@@ -57,14 +57,20 @@
 
             <Button
                 android:id="@+id/btnSubmit"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                android:layout_width="119dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/rounded_button"
+                android:lineSpacingExtra="14sp"
                 android:text="发送"
+                android:textAlignment="center"
                 android:textAllCaps="false"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textColor="@android:color/white"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:typeface="normal"
+                tools:visibility="visible" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

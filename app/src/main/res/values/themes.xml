@@ -1,5 +1,31 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
+<!-- 新增Material3主题配置 -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.MyApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- 定制主题颜色 -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryContainer">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryContainer">@color/teal_700</item>
 
-    <style name="Theme.Chattest" parent="android:Theme.Material.Light.NoActionBar" />
+        <!-- 组件样式统一 -->
+        <item name="buttonStyle">@style/Widget.ChatTest.Button</item>
+        <item name="editTextStyle">@style/Widget.ChatTest.TextInputEditText</item>
+    </style>
+
+    <!-- 自定义按钮样式 -->
+    <style name="Widget.ChatTest.Button" parent="Widget.Material3.Button">
+        <item name="shapeAppearance">@style/ShapeAppearance.ChatTest.MediumComponent</item>
+    </style>
+
+    <!-- 自定义输入框样式 -->
+    <style name="Widget.ChatTest.TextInputEditText" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="shapeAppearance">@style/ShapeAppearance.ChatTest.MediumComponent</item>
+    </style>
+
+    <!-- 统一圆角形状 -->
+    <style name="ShapeAppearance.ChatTest.MediumComponent" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerSize">16dp</item>
+    </style>
 </resources>
