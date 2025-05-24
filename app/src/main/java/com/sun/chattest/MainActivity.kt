@@ -1,47 +1,93 @@
 package com.sun.chattest
 
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.sun.chattest.ui.theme.ChattestTheme
+import io.noties.markwon.Markwon
+import okhttp3.*
+import java.io.IOException
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+        .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+        .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+        .build()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            ChattestTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+        setContentView(R.layout.activity_main)
+
+        val question = findViewById<EditText>(R.id.etQuestion)
+        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+        val txtResponse = findViewById<TextView>(R.id.txtResponse)
+        val markwon = Markwon.create(this)
+
+
+        btnSubmit.setOnClickListener {
+            val questionText = question.text.toString()
+            Toast.makeText(this, "提问中: $questionText", Toast.LENGTH_SHORT).show()
+
+            getResponse(questionText) { response ->
+                runOnUiThread {
+                    val formattedResponse = response.replace("\\n", "\n")
+                    markwon.setMarkdown(txtResponse, formattedResponse)
                 }
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private fun getResponse(question: String, callback: (String) -> Unit) {
+        val apiKey = "sk-trtxvukyresekejjnymgityktjyybtmtccvnlbwhbwnnvoji"  // 建议通过 gradle.properties 或安全方式存储
+        val url = "https://api.siliconflow.cn/v1/chat/completions" // 示例URL，请根据实际修改
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ChattestTheme {
-        Greeting("Android")
+        val json = """
+            {
+                "model": "Qwen/QwQ-32B",
+                "messages": [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": "$question"}
+                ],
+                "temperature": 0.7,
+                "max_tokens": 1024
+            }
+        """.trimIndent()
+
+        val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
+        val body = json.toRequestBody(mediaType)
+
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("Authorization", "Bearer $apiKey")
+            .addHeader("Content-Type", "application/json")
+            .post(body)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                callback("请求失败: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (!response.isSuccessful) {
+                    callback("服务器错误: ${response.code}")
+                    return
+                }
+
+                val bodyString = response.body?.string()
+                // 注意：你需要从 JSON 中提取实际回答内容
+                // 假设返回 JSON 类似：{"choices":[{"message":{"content":"答案"}}]}
+                val content = Regex("\"content\"\\s*:\\s*\"(.*?)\"")
+                    .find(bodyString ?: "")?.groups?.get(1)?.value
+
+                callback(content ?: "解析失败")
+            }
+        })
     }
 }
